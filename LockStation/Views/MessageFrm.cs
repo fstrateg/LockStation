@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LockStation.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,9 +13,36 @@ namespace LockStation
 {
     public partial class MessageFrm : Form
     {
+        MainModel Model = new MainModel();
+        Timer Timer = new Timer();
         public MessageFrm()
         {
             InitializeComponent();
+        }
+
+        private void notyfyTool_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button== MouseButtons.Middle) Model.CanClose=true;          
+            if (e.Button == MouseButtons.Left)  this.Show();
+        }
+
+        private void MessageFrm_Load(object sender, EventArgs e)
+        {
+            this.FormClosing += (s0, e0) => { 
+                if (!Model.CanClose)
+                {
+                    e0.Cancel = true;
+                    this.Hide();
+                    return;
+                }
+            };
+            Timer.Interval= 5000;
+            Timer.Start();
+            Timer.Tick += (e0, s0) => { timeLabel.Text = Model.TimeString; };
+
+            Model.NeedClose += (e0, s0) => {
+                this.Show();
+            };
         }
     }
 }
