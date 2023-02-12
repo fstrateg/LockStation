@@ -12,14 +12,16 @@ namespace LockStation.Models
         public bool CanClose { get; set; } = false;
         public DateTime MaxTime { get; set; }
         public DateTime MinTime { get; set; }
+        public DateTime CurTime { get; set; }
 
         public event EventHandler NeedClose;
+        public event EventHandler ShutDown;
 
         public string TimeString
         {
             get
             { 
-                var time = MaxTime- DateTime.Now.AddHours(4);
+                var time = MaxTime - CurTime.AddMinutes(-1);
                 if (time.TotalSeconds < 0)
                 {
                     NeedClose?.Invoke(this, new EventArgs());
@@ -29,9 +31,24 @@ namespace LockStation.Models
             }
         }
 
+        public string GrantedTimeString
+        {
+            get
+            {
+                return MinTime.ToString("dd.MM.yy HH:mm")+" - "+MaxTime.ToString("HH:mm");
+            }
+        }
+
         public MainModel() 
         {
-            MaxTime = DateTime.Now.Date.AddHours(21);
+            CurTime = DateTime.Now;
+            MinTime = DateTime.Now.Date.AddHours(19);
+            MaxTime = DateTime.Now.Date.AddHours(23).AddMinutes(55);
+        }
+
+        public bool NeedWarning()
+        {
+            return false;
         }
     }
 }

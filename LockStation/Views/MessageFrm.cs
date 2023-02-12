@@ -28,6 +28,7 @@ namespace LockStation
 
         private void MessageFrm_Load(object sender, EventArgs e)
         {
+            bindingSource1.DataSource = Model;
             this.FormClosing += (s0, e0) => { 
                 if (!Model.CanClose)
                 {
@@ -38,7 +39,10 @@ namespace LockStation
             };
             Timer.Interval= 5000;
             Timer.Start();
-            Timer.Tick += (e0, s0) => { timeLabel.Text = Model.TimeString; };
+            Timer.Tick += (e0, s0) => {
+                Model.CurTime = DateTime.Now;
+                bindingSource1.ResetBindings(false);
+            };
 
             Model.NeedClose += (e0, s0) => {
                 this.Show();
