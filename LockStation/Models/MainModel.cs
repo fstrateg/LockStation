@@ -6,13 +6,17 @@ using System.Threading.Tasks;
 
 namespace LockStation.Models
 {
+    public enum State { Work, Shutdown };
     public class MainModel
     {
         const string ZERO = "00:00";
+        
+
+        public State WorkState { get; set; } = State.Work;
         public bool CanClose { get; set; } = false;
-        public DateTime MaxTime { get; set; }
-        public DateTime MinTime { get; set; }
-        public DateTime CurTime { get; set; }
+
+        public int Total = 0;
+        public int Elapsed = 0;
 
         public event EventHandler NeedClose;
         public event EventHandler ShutDown;
@@ -20,35 +24,44 @@ namespace LockStation.Models
         public string TimeString
         {
             get
-            { 
-                var time = MaxTime - CurTime.AddMinutes(-1);
-                if (time.TotalSeconds < 0)
+            {
+                int time = Total - Elapsed;
+                
+                if (time < 0)
                 {
                     NeedClose?.Invoke(this, new EventArgs());
                     return ZERO;
                 }
-                return new DateTime(time.Ticks).ToString("HH:mm"); 
+                return ConvertMinInString(time);
             }
         }
 
-        public string GrantedTimeString
+        public string TimeGranted
         {
-            get
-            {
-                return MinTime.ToString("dd.MM.yy HH:mm")+" - "+MaxTime.ToString("HH:mm");
-            }
+            get { return ConvertMinInString(Total); }
         }
 
+        private string ConvertMinInString(int time)
+        {
+            return $"{time / 60:D2}:{time % 60:D2}";
+        }
+
+        public void Tick()
+        {
+            Elapsed++;
+            int time = Total- Elapsed;
+            if (time <= 5 && WorkState == State.Work)
+            {
+                WorkState = State.Shutdown;
+                NeedClose?.Invoke(this, new EventArgs());
+            }
+
+            if (time < 0) ShutDown?.Invoke(this, new EventArgs());
+        }
         public MainModel() 
         {
-            CurTime = DateTime.Now;
-            MinTime = DateTime.Now.Date.AddHours(19);
-            MaxTime = DateTime.Now.Date.AddHours(23).AddMinutes(55);
-        }
-
-        public bool NeedWarning()
-        {
-            return false;
+            Total = 180;
+            Elapsed = 0;
         }
     }
 }

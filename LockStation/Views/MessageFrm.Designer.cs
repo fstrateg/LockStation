@@ -58,7 +58,7 @@
             // 
             // label1
             // 
-            this.label1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource1, "GrantedTimeString", true));
+            this.label1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource1, "TimeGranted", true));
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label1.ForeColor = System.Drawing.SystemColors.ActiveCaption;
             this.label1.Location = new System.Drawing.Point(12, 158);

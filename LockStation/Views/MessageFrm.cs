@@ -37,15 +37,19 @@ namespace LockStation
                     return;
                 }
             };
-            Timer.Interval= 5000;
+            Timer.Interval= 60000/30;
             Timer.Start();
             Timer.Tick += (e0, s0) => {
-                Model.CurTime = DateTime.Now;
+                Model.Tick();
                 bindingSource1.ResetBindings(false);
             };
 
             Model.NeedClose += (e0, s0) => {
                 this.Show();
+            };
+            Model.ShutDown += (e0, s0) =>
+            {
+                MessageBox.Show("Выключаемся!");
             };
         }
     }
